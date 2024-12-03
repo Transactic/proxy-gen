@@ -45,7 +45,7 @@
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             text-align: center;
         }
@@ -85,9 +85,13 @@
             background: #45a049;
         }
 
-        .output {
+        .output-container {
             margin-top: 20px;
+        }
+
+        .output-section {
             text-align: left;
+            margin-top: 10px;
             background: rgba(255, 255, 255, 0.1);
             padding: 10px;
             border-radius: 8px;
@@ -97,14 +101,9 @@
             font-size: 14px;
         }
 
-        .status {
-            margin-top: 10px;
-            font-size: 16px;
-            color: #ccc;
-        }
-
-        .status span {
+        .output-title {
             font-weight: bold;
+            margin-bottom: 5px;
         }
 
         footer {
@@ -129,11 +128,17 @@
         <label for="proxyCount">How many proxies do you need?</label>
         <input type="number" id="proxyCount" placeholder="Enter a number" min="1">
         <button onclick="generateProxies()">Generate</button>
-        <div class="output" id="output" style="display:none;"></div>
-        <div class="status" id="status" style="display:none;">
-            Valid: <span id="validCount">0</span> | Invalid: <span id="invalidCount">0</span>
+        <div class="output-container" style="display:none;">
+            <div class="output-section">
+                <div class="output-title">Valid Proxies:</div>
+                <div id="validOutput"></div>
+            </div>
+            <div class="output-section">
+                <div class="output-title">Invalid Proxies:</div>
+                <div id="invalidOutput"></div>
+            </div>
         </div>
-        <button id="copyButton" style="display:none;" onclick="copyProxies()">Copy to Clipboard</button>
+        <button id="copyButton" style="display:none;" onclick="copyProxies()">Copy Valid Proxies</button>
         <footer>
             Built with ❤️ by <a href="#">Your Name</a>
         </footer>
@@ -147,15 +152,13 @@
                 return;
             }
 
-            const output = document.getElementById('output');
+            const validOutput = document.getElementById('validOutput');
+            const invalidOutput = document.getElementById('invalidOutput');
+            const outputContainer = document.querySelector('.output-container');
             const copyButton = document.getElementById('copyButton');
-            const status = document.getElementById('status');
-            const validCount = document.getElementById('validCount');
-            const invalidCount = document.getElementById('invalidCount');
 
-            const proxies = [];
-            let valid = 0;
-            let invalid = 0;
+            const validProxies = [];
+            const invalidProxies = [];
 
             for (let i = 0; i < count; i++) {
                 const ip = `${randomNumber(1, 255)}.${randomNumber(1, 255)}.${randomNumber(1, 255)}.${randomNumber(1, 255)}`;
@@ -164,22 +167,17 @@
 
                 // Randomly determine if a proxy is "valid" or "invalid" for demo purposes
                 if (Math.random() > 0.5) {
-                    proxies.push(proxy + " (Valid)");
-                    valid++;
+                    validProxies.push(proxy);
                 } else {
-                    proxies.push(proxy + " (Invalid)");
-                    invalid++;
+                    invalidProxies.push(proxy);
                 }
             }
 
-            output.style.display = 'block';
-            output.textContent = proxies.join('\n');
+            validOutput.textContent = validProxies.join('\n');
+            invalidOutput.textContent = invalidProxies.join('\n');
 
-            status.style.display = 'block';
-            validCount.textContent = valid;
-            invalidCount.textContent = invalid;
-
-            copyButton.style.display = 'block';
+            outputContainer.style.display = 'block';
+            copyButton.style.display = validProxies.length > 0 ? 'block' : 'none';
         }
 
         function randomNumber(min, max) {
@@ -187,9 +185,9 @@
         }
 
         function copyProxies() {
-            const output = document.getElementById('output');
-            navigator.clipboard.writeText(output.textContent)
-                .then(() => alert('Proxies copied to clipboard!'))
+            const validOutput = document.getElementById('validOutput');
+            navigator.clipboard.writeText(validOutput.textContent)
+                .then(() => alert('Valid proxies copied to clipboard!'))
                 .catch(() => alert('Failed to copy proxies.'));
         }
     </script>
